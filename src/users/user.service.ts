@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateUserDTO } from "./DTO/create-user";
-import { UpdatePutUserDTO } from "./DTO/update-put-user";
 import { UpdatePatchUserDTO } from "./DTO/update-patch-user";
+import { UpdatePutUserDTO } from "./DTO/update-put-user";
 
 @Injectable()
 export class UserService {
@@ -41,5 +41,18 @@ export class UserService {
                 id
             }
         });
+    }
+    async delete(id:number){
+        await this.exists(id);
+        return this.prisma.user.delete({
+            where:{
+                id
+            }
+        });
+    }
+    async exists(id:number){
+        if(!await this.show(id)){
+            throw new NotFoundException(`Usuário não existe.`);            
+        }
     }
 }
